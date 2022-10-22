@@ -1,0 +1,52 @@
+.index {
+  background: #fff;
+  .actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .header {
+    padding: 8px 16px;
+    border-bottom: 1px solid rgba($color: #000000, $alpha: 0.1);
+    color: #333;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .fileList {
+    .item {
+      padding: 0 16px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      .fileName {
+        padding: 0 8px;
+        flex: 1;
+      }
+    }
+    .item + .item {
+      border-top: 1px solid rgba($color: #000000, $alpha: 0.06);
+    }
+    .selected,
+    .item:hover {
+      position: relative;
+      &::before {
+        content: ' ';
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: var(--ant-primary-color);
+        opacity: 0.06;
+      }
+    }
+    .deleted {
+      color: #999;
+      text-decoration: line-through;
+    }
+  }
+}
+

@@ -1,0 +1,33 @@
+{
+  "main": "./index.html",
+  "preload": "./preload.js",
+  "logo": "./logo.png",
+  "pluginName": "重复文件查找",
+  "description": "查找目录下的重复文件",
+  "author": "lblblong",
+  "homepage": "https://github.com/lblblong",
+  "version": "0.0.2",
+  "platform": ["win32"],
+  "features": [
+    {
+      "code": "home",
+      "explain": "查找该目录下重复文件",
+      "cmds": [
+        {
+          "type": "window",
+          "label": "查找该目录下重复文件",
+          "fileType": "directory",
+          "match": {
+            "app": ["Finder.app", "explorer.exe"]
+          }
+        }
+      ]
+    },
+    {
+      "code": "cfwj",
+      "explain": "查找重复文件",
+      "cmds": ["重复文件查找"]
+    }
+  ]
+}
+

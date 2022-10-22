@@ -1,0 +1,17 @@
+.index {
+  height: 50px;
+  padding: 0 16px;
+  background: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  .num {
+    font-weight: bold;
+    color: var(--ant-primary-color);
+  }
+  .actions {
+    display: flex;
+    gap: 12px;
+  }
+}
+
