@@ -7,7 +7,10 @@ export class Store {
     makeAutoObservable(this)
 
     utools.onPluginEnter(async () => {
-      const path = await utools.readCurrentFolderPath()
+      let path = await utools.readCurrentFolderPath()
+      if (path.includes(' ')) {
+        path = `"${path}"`
+      }
       this.keyword = path
     })
 
