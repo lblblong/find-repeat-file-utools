@@ -1,3 +1,4 @@
+import asar from 'asar'
 import cp from 'child_process'
 import { EventEmitter } from 'events'
 import fs from 'fs'
@@ -6,6 +7,14 @@ import { IHasher } from 'hash-wasm/dist/lib/WASMInterface'
 import iconv from 'iconv-lite'
 import path from 'path'
 import rimraf from 'rimraf'
+
+const base = utools.isDev() ? __dirname : __dirname + '.unpacked'
+
+function unpack() {
+  if (utools.isDev() || fs.existsSync(base)) return
+  emitStateChange('初始化中...')
+  asar.extractAll(__dirname, base)
+}
 
 function iconvDecode(str = '') {
   return iconv.decode(Buffer.from(str, 'binary'), 'cp936')
@@ -28,14 +37,16 @@ function search(keyword: string) {
 
   return new Promise<string[]>((ok, fail) => {
     let command = `${path.resolve(
-      __dirname,
+      base,
       './es/es.exe'
     )} /a-d -path '${pathOption}'`
 
     if (searchText) {
       command += ` '${searchText}'`
     }
-    console.log('执行命令', command)
+
+    console.log('执行命令：', command)
+
     cp.exec(
       command,
       {
@@ -43,8 +54,9 @@ function search(keyword: string) {
         maxBuffer: 1024 * 1024 * 1024,
         shell: 'powershell.exe',
       },
-      (err, stdout, stderr) => {
+      (err, stdout, _) => {
         if (err) {
+          err.message = iconvDecode(err.message)
           fail(err)
         } else {
           ok(iconvDecode(stdout).split('\r\n').filter(Boolean))
@@ -106,6 +118,7 @@ function fileMd5(filePath: string) {
 
 export async function start(keyword: string) {
   try {
+    unpack()
     const startTime = Date.now()
     emitStateChange('正在检索文件...')
     const filePaths = await search(keyword)
