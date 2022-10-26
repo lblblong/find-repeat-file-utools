@@ -20,7 +20,7 @@ export const List = () => {
                     store.select(keep as any, group.hash)
                   }}
                   onDeleteItem={(i) => {
-                    rmf(group.files[i].path)
+                    rmf(group.files[i].filePath)
                     group.files[i].deleted = true
                   }}
                   onDelete={() => {

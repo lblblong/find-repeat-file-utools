@@ -16,7 +16,15 @@ export const Footer = () => {
       <Menu.Item onClick={() => store.select('pathShort')}>
         保留路径短的
       </Menu.Item>
-      <Menu.Item onClick={() => store.select('outer')}>保留最外层的</Menu.Item>
+      <Menu.Item onClick={() => store.select('shallow')}>
+        保留层级浅的
+      </Menu.Item>
+      <Menu.Item onClick={() => store.select('minTime')}>
+        保留最早创建的
+      </Menu.Item>
+      <Menu.Item onClick={() => store.select('maxTime')}>
+        保留最晚创建的
+      </Menu.Item>
     </Menu>
   )
 
@@ -24,7 +32,12 @@ export const Footer = () => {
     <div className={styles.index}>
       <Observer>
         {() => {
-          return <div>已选中 <span className={styles.num}>{store.selectedCount}</span> 个文件（数据无价，请谨慎操作）</div>
+          return (
+            <div>
+              已选中 <span className={styles.num}>{store.selectedCount}</span>{' '}
+              个文件（数据无价，请谨慎操作）
+            </div>
+          )
         }}
       </Observer>
       <Observer>

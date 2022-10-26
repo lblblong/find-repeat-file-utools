@@ -21,8 +21,9 @@ export class Store {
     onRefresh((preload) => {
       let group = this.repeatFileGroups.find((g) => g.hash === preload.hash)
 
-      const files = preload.repeatFiles.map((path) => ({
-        path,
+      const files = preload.repeatFiles.map(({ filePath, stats }) => ({
+        filePath,
+        stats,
         deleted: false,
         selected: false,
       }))
@@ -73,7 +74,10 @@ export class Store {
     }
   }
 
-  select = (keep: 'outer' | 'nameShort' | 'pathShort', hash?: string) => {
+  select = (
+    keep: 'shallow' | 'nameShort' | 'pathShort' | 'minTime' | 'maxTime',
+    hash?: string
+  ) => {
     let groups: IRepeatFileGroup[] = hash
       ? [this.repeatFileGroups.find((g) => g.hash === hash)!]
       : this.repeatFileGroups
@@ -92,10 +96,12 @@ export class Store {
       }
 
       switch (keep) {
-        case 'outer':
+        case 'shallow':
           _select(
             files.sort((a, b) => {
-              return a.path.split('\\').length - b.path.split('\\').length
+              return (
+                a.filePath.split('\\').length - b.filePath.split('\\').length
+              )
             })
           )
           break
@@ -103,8 +109,8 @@ export class Store {
           _select(
             files.sort((a, b) => {
               return (
-                a.path.split('\\').pop()!.length -
-                b.path.split('\\').pop()!.length
+                a.filePath.split('\\').pop()!.length -
+                b.filePath.split('\\').pop()!.length
               )
             })
           )
@@ -112,7 +118,21 @@ export class Store {
         case 'pathShort':
           _select(
             files.sort((a, b) => {
-              return a.path.length - b.path.length
+              return a.filePath.length - b.filePath.length
+            })
+          )
+          break
+        case 'minTime':
+          _select(
+            files.sort((a, b) => {
+              return +a.stats.birthtime - +b.stats.birthtime
+            })
+          )
+          break
+        case 'maxTime':
+          _select(
+            files.sort((a, b) => {
+              return +b.stats.birthtime - +a.stats.birthtime
             })
           )
           break
@@ -128,7 +148,7 @@ export class Store {
     for (const group of groups) {
       for (const file of group.files) {
         if (file.deleted || !file.selected) continue
-        rmf(file.path)
+        rmf(file.filePath)
         file.deleted = true
       }
     }

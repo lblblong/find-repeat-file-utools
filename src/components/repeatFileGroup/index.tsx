@@ -1,5 +1,6 @@
 import { Button, Checkbox, Dropdown, Menu } from 'antd'
 import clsx from 'clsx'
+import dayjs from 'dayjs'
 import { Observer } from 'mobx-react-lite'
 import { FC } from 'react'
 import { IRepeatFile, IRepeatFileGroup } from '../../interface'
@@ -17,13 +18,15 @@ export const RepeatFileGroup: FC<RepeatFileGroupProps> = ({
   group,
   onSelect,
   onDeleteItem,
-  onDelete
+  onDelete,
 }) => {
   const menu = (
     <Menu>
       <Menu.Item onClick={() => onSelect('nameShort')}>保留名字短的</Menu.Item>
       <Menu.Item onClick={() => onSelect('pathShort')}>保留路径短的</Menu.Item>
-      <Menu.Item onClick={() => onSelect('outer')}>保留最外层的</Menu.Item>
+      <Menu.Item onClick={() => onSelect('shallow')}>保留层级浅的</Menu.Item>
+      <Menu.Item onClick={() => onSelect('minTime')}>保留最早创建的</Menu.Item>
+      <Menu.Item onClick={() => onSelect('maxTime')}>保留最晚创建的</Menu.Item>
     </Menu>
   )
 
@@ -32,7 +35,7 @@ export const RepeatFileGroup: FC<RepeatFileGroupProps> = ({
       {() => (
         <div className={styles.index}>
           <div className={styles.header}>
-            <div>{group.hash}</div>
+            <div className={styles.md5}>MD5: {group.hash}</div>
             <div className={styles.actions}>
               <Dropdown overlay={menu} trigger={['click']}>
                 <Button
@@ -44,12 +47,15 @@ export const RepeatFileGroup: FC<RepeatFileGroupProps> = ({
                 type="text"
                 danger
                 icon={<Icon value="delete-bin-line" />}
-                onClick={()=>onDelete()}
+                onClick={() => onDelete()}
               ></Button>
             </div>
           </div>
           <div className={styles.fileList}>
             {group.files.map((file, i) => {
+              const filePathSplit = file.filePath.split('\\')
+              const name = filePathSplit.pop()
+              const ditPath = filePathSplit.join('\\')
               return (
                 <div
                   style={
@@ -57,7 +63,7 @@ export const RepeatFileGroup: FC<RepeatFileGroupProps> = ({
                       '--ant-primary-color': 'var(--ant-error-color)',
                     } as any
                   }
-                  key={file.path}
+                  key={file.filePath}
                   className={clsx(
                     styles.item,
                     file.selected && styles.selected,
@@ -73,7 +79,25 @@ export const RepeatFileGroup: FC<RepeatFileGroupProps> = ({
                     checked={file.selected}
                     onChange={(e) => (file.selected = e.target.checked)}
                   ></Checkbox>
-                  <div className={styles.fileName}>{file.path}</div>
+                  <div className={styles.info}>
+                    <div className={styles.name}>{name}</div>
+                    <div className={styles.metas}>
+                      <span>
+                        <Icon className={styles.icon} value="time-line" />
+                        {dayjs(file.stats.birthtime).format(
+                          'YYYY-MM-DD hh:mm:ss'
+                        )}
+                      </span>
+                      <span>
+                        <Icon
+                          className={styles.icon}
+                          value="pie-chart-2-line"
+                        />
+                        {(file.stats.size / 1024).toFixed(0)}kb
+                      </span>
+                      <span className={styles.path}>{ditPath}</span>
+                    </div>
+                  </div>
                   {!file.deleted && (
                     <div className={styles.actions}>
                       <Button
@@ -81,7 +105,7 @@ export const RepeatFileGroup: FC<RepeatFileGroupProps> = ({
                         icon={<Icon value="eye-line" />}
                         onClick={(e) => {
                           e.stopPropagation()
-                          utools.shellOpenPath(file.path)
+                          utools.shellOpenPath(file.filePath)
                         }}
                       ></Button>
                       <Button
@@ -89,7 +113,7 @@ export const RepeatFileGroup: FC<RepeatFileGroupProps> = ({
                         icon={<Icon value="folder-2-line" />}
                         onClick={(e) => {
                           e.stopPropagation()
-                          utools.shellShowItemInFolder(file.path)
+                          utools.shellShowItemInFolder(file.filePath)
                         }}
                       ></Button>
                       <Button

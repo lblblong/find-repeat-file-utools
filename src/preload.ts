@@ -69,10 +69,13 @@ function search(keyword: string) {
 let hasher: IHasher | null = null
 
 function fileMd5(filePath: string) {
-  return new Promise<string>(async (ok, fail) => {
+  return new Promise<{
+    hash: string
+    stats: fs.Stats
+  }>(async (ok, fail) => {
     try {
-      const stateInfo = fs.statSync(filePath)
-      const fileSize = stateInfo.size
+      const statsInfo = fs.statSync(filePath)
+      const fileSize = statsInfo.size
 
       //文件每块分割10M，计算分割详情
       // chunkSize = 2097152,
@@ -103,7 +106,10 @@ function fileMd5(filePath: string) {
           } else {
             fs.closeSync(fd)
             const hash = hasher!.digest()
-            ok(hash)
+            ok({
+              hash,
+              stats: statsInfo,
+            })
           }
         })
       }
@@ -123,19 +129,28 @@ export async function start(keyword: string) {
     emitStateChange('正在检索文件...')
     const filePaths = await search(keyword)
 
-    const repeatFileGroups = new Map<string, string[]>()
+    const repeatFileGroups = new Map<
+      string,
+      {
+        filePath: string
+        stats: fs.Stats
+      }[]
+    >()
     let hashCache: string[] = []
 
     for (const filePath of filePaths) {
       emitStateChange(`正在计算 MD5: ${filePath}`)
       try {
-        const hash = await fileMd5(filePath)
+        const { hash, stats } = await fileMd5(filePath)
         let repeatFiles = repeatFileGroups.get(hash)
         if (!repeatFiles) {
           repeatFiles = []
           repeatFileGroups.set(hash, repeatFiles)
         }
-        repeatFiles.push(filePath)
+        repeatFiles.push({
+          filePath,
+          stats,
+        })
 
         if (hashCache.includes(hash)) {
           emitRefresh({
@@ -177,12 +192,24 @@ function emitStateChange(text: string) {
 }
 
 export function onRefresh(
-  cb: (payload: { hash: string; repeatFiles: string[] }) => void
+  cb: (payload: {
+    hash: string
+    repeatFiles: {
+      filePath: string
+      stats: fs.Stats
+    }[]
+  }) => void
 ) {
   nodeEvent.on('refresh', cb)
 }
 
-function emitRefresh(payload: { hash: string; repeatFiles: string[] }) {
+function emitRefresh(payload: {
+  hash: string
+  repeatFiles: {
+    filePath: string
+    stats: fs.Stats
+  }[]
+}) {
   nodeEvent.emit('refresh', payload)
 }
 

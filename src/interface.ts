@@ -1,10 +1,13 @@
+import { Stats } from 'fs'
+
 export interface IRepeatFileGroup {
   hash: string
   files: IRepeatFile[]
 }
 
 export interface IRepeatFile {
-  path: string
+  filePath: string
+  stats: Stats
   deleted: boolean
   selected: boolean
 }

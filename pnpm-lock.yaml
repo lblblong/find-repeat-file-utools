@@ -10,6 +10,7 @@ specifiers:
   antd: ^4.23.6
   asar: ^3.2.0
   clsx: ^1.2.1
+  dayjs: ^1.11.6
   hash-wasm: ^4.9.0
   iconv-lite: ^0.6.3
   mobx: ^6.6.2
@@ -30,6 +31,7 @@ dependencies:
   antd: 4.23.6_biqbaboplfbrettd7655fr4n2y
   asar: 3.2.0
   clsx: 1.2.1
+  dayjs: 1.11.6
   hash-wasm: 4.9.0
   iconv-lite: 0.6.3
   mobx: 6.6.2

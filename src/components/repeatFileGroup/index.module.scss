@@ -8,8 +8,7 @@
   .header {
     padding: 8px 16px;
     border-bottom: 1px solid rgba($color: #000000, $alpha: 0.1);
-    color: #333;
-    font-weight: bold;
+    color: rgba($color: #000000, $alpha: 0.3);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -17,17 +16,44 @@
   .fileList {
     .item {
       padding: 0 16px;
-      height: 50px;
+      height: 66px;
       display: flex;
       align-items: center;
       cursor: pointer;
-      .fileName {
-        padding: 0 8px;
+      .info {
+        padding: 0 16px;
         flex: 1;
+        .name {
+          font-weight: bold;
+          font-size: 16px;
+        }
+        .metas {
+          display: flex;
+          align-items: center;
+          overflow: hidden;
+          gap: 16px;
+          color: rgba($color: #000000, $alpha: 0.3);
+          font-size: 12px;
+          line-height: 1;
+          padding-top: 8px;
+          > * {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            .icon {
+              margin-right: 4px;
+            }
+          }
+          .path {
+            overflow: hidden; //超出的文本隐藏
+            text-overflow: ellipsis; //溢出用省略号显示
+            white-space: nowrap; //溢出不换行
+          }
+        }
       }
     }
     .item + .item {
-      border-top: 1px solid rgba($color: #000000, $alpha: 0.06);
+      border-top: 1px solid rgba($color: #000000, $alpha: 0.03);
     }
     .selected,
     .item:hover {
@@ -44,8 +70,10 @@
       }
     }
     .deleted {
-      color: #999;
-      text-decoration: line-through;
+      .name {
+        color: #999;
+        text-decoration: line-through;
+      }
     }
   }
 }
